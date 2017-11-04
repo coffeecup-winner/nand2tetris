@@ -1,0 +1,14 @@
+CHIP ZNeg {
+  IN
+    in[16], // input value
+    zero, // zero?
+    negate; //negate?
+
+  OUT
+    out[16]; // processed value
+
+  PARTS:
+    Mux16(a = in, b[0..15] = false, sel = zero, out = v0);
+    Not16(in = v0, out = v1);
+    Mux16(a = v0, b = v1, sel = negate, out = out);
+}

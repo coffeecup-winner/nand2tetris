@@ -27,20 +27,28 @@
 // if (out < 0) set ng = 1
 
 CHIP ALU {
-    IN  
-        x[16], y[16],  // 16-bit inputs        
-        zx, // zero the x input?
-        nx, // negate the x input?
-        zy, // zero the y input?
-        ny, // negate the y input?
-        f,  // compute out = x + y (if 1) or x & y (if 0)
-        no; // negate the out output?
+  IN
+    x[16], y[16],  // 16-bit inputs
+    zx, // zero the x input?
+    nx, // negate the x input?
+    zy, // zero the y input?
+    ny, // negate the y input?
+    f,  // compute out = x + y (if 1) or x & y (if 0)
+    no; // negate the out output?
 
-    OUT 
-        out[16], // 16-bit output
-        zr, // 1 if (out == 0), 0 otherwise
-        ng; // 1 if (out < 0),  0 otherwise
+  OUT
+    out[16], // 16-bit output
+    zr, // 1 if (out == 0), 0 otherwise
+    ng; // 1 if (out < 0),  0 otherwise
 
-    PARTS:
-   // Put you code here:
+  PARTS:
+    ZNeg(in = x, zero = zx, negate = nx, out = x0);
+    ZNeg(in = y, zero = zy, negate = ny, out = y0);
+    And16(a = x0, b = y0, out = v0);
+    Add16(a = x0, b = y0, out = v1);
+    Mux16(a = v0, b = v1, sel = f, out = v2);
+    ZNeg(in = v2, zero = false, negate = no, out = res);
+    IsNeg(in = res, out = ng);
+    IsZero(in = res, out = zr);
+    Or16(a = res, b[0..15] = false, out = out); // nop, res -> out
 }
