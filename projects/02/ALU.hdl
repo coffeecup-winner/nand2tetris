@@ -47,8 +47,10 @@ CHIP ALU {
     And16(a = x0, b = y0, out = v0);
     Add16(a = x0, b = y0, out = v1);
     Mux16(a = v0, b = v1, sel = f, out = v2);
-    ZNeg(in = v2, zero = false, negate = no, out = res);
-    IsNeg(in = res, out = ng);
-    IsZero(in = res, out = zr);
-    Or16(a = res, b[0..15] = false, out = out); // nop, res -> out
+    ZNeg(in = v2, zero = false, negate = no,
+         out = out, out[0..7] = lo, out[8..15] = hi, out[15] = ng);
+    Or8Way(in = lo, out = z0);
+    Or8Way(in = hi, out = z1);
+    Or(a = z0, b = z1, out = z2);
+    Not(in = z2, out = zr);
 }
